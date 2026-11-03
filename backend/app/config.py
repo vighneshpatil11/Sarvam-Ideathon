@@ -3,7 +3,10 @@ from typing import List
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_DB_PATH = os.path.join(BASE_DIR, "saarthi.db").replace("\\", "/")
+if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    DEFAULT_DB_PATH = "/tmp/saarthi.db"
+else:
+    DEFAULT_DB_PATH = os.path.join(BASE_DIR, "saarthi.db").replace("\\", "/")
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -19,10 +22,10 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
 
     # Database: Supports SQLite (absolute path default) or PostgreSQL
-    DATABASE_URL: str = f"sqlite:///{DEFAULT_DB_PATH}"
+    DATABASE_URL: str = os.environ.get("DATABASE_URL") or f"sqlite:///{DEFAULT_DB_PATH}"
 
-    FRONTEND_URL: str = "http://localhost:3000"
-    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+    FRONTEND_URL: str = "*"
+    CORS_ORIGINS: str = "*"
 
     # Sarvam AI
     SARVAM_API_KEY: str = ""
@@ -40,6 +43,8 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> List[str]:
+        if self.CORS_ORIGINS == "*":
+            return ["*"]
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
 
 settings = Settings()

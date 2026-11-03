@@ -39,6 +39,10 @@ async def lifespan(app: FastAPI):
             )
             db.add(admin)
             db.commit()
+
+        # Seed core Maharashtra submission services if DB is uninitialized
+        from app.seed import seed_if_empty
+        seed_if_empty(db)
     finally:
         db.close()
     yield
@@ -53,10 +57,11 @@ app = FastAPI(
 )
 
 # CORS Middleware
+is_wildcard = "*" in settings.cors_origins_list
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
+    allow_credentials=not is_wildcard,
     allow_methods=["*"],
     allow_headers=["*"],
 )
