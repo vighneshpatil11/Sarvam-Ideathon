@@ -40,7 +40,7 @@ class SarvamAIProvider(BaseAIProvider):
             "model": self.model,
             "messages": chat_messages,
             "temperature": 0.4,
-            "max_tokens": 1200
+            "max_tokens": 700
         }
 
         try:
