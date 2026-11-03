@@ -79,15 +79,19 @@ export function AssistantWidget({ standalone = false }: { standalone?: boolean }
     }
   }, [language]);
 
-  const speak = async (text: string, langCode = bcp47) => {
-    // If already loading or speaking, prevent duplicate requests (Rate-limit)
-    if (audioLoading || playingAudio) {
-      if (currentAudioRef.current) {
-        currentAudioRef.current.pause();
-        currentAudioRef.current = null;
-      }
-      setPlayingAudio(false);
+  const stopAudio = () => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
+      currentAudioRef.current = null;
     }
+    setPlayingAudio(false);
+    setAudioLoading(false);
+  };
+
+  const speak = async (text: string, langCode = bcp47) => {
+    // Stop any currently playing audio before starting a new one
+    stopAudio();
 
     setAudioLoading(true);
     try {
@@ -297,9 +301,9 @@ export function AssistantWidget({ standalone = false }: { standalone?: boolean }
                   <button
                     className="message-speak-button"
                     type="button"
-                    onClick={() => speak(m.text, langToBcp47(language))}
+                    onClick={() => playingAudio ? stopAudio() : speak(m.text, langToBcp47(language))}
                     disabled={audioLoading}
-                    aria-label="Play reply"
+                    aria-label={playingAudio ? "Stop audio" : "Play reply"}
                     style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
                   >
                     {audioLoading ? (
