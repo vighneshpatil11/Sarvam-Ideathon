@@ -7,6 +7,31 @@ from app.schemas import ApiResponse, ServiceSummary, ServiceListResponse, Servic
 
 router = APIRouter(prefix="/services", tags=["Services"])
 
+
+def _static_service_list(language: str = "en") -> List[ServiceSummary]:
+    """Return hardcoded service list directly from seed data — works even if SQLite is empty."""
+    from app.seed import SUBMISSION_SERVICES
+    items = []
+    for s in SUBMISSION_SERVICES:
+        name = s["name_mr"] if language == "mr" else s["name_en"]
+        short_desc = s.get("short_description_mr") if language == "mr" else s.get("short_description_en", "")
+        dept = s.get("dept_name_mr") if language == "mr" else s.get("dept_name_en", "Maharashtra Govt")
+        items.append(ServiceSummary(
+            id=s["slug"],
+            slug=s["slug"],
+            name=name or s["name_en"],
+            short_description=short_desc or s.get("short_description_en", ""),
+            department_name=dept or s.get("dept_name_en", "Maharashtra Govt"),
+            state="Maharashtra",
+            districts=["Pune", "All Districts"],
+            languages=["en", "hi", "mr"],
+            verification_status="verified",
+            is_demo=False,
+            statutory_fee_inr=s["statutory_fee_inr"],
+            processing_days=s["processing_days"],
+        ))
+    return items
+
 @router.get("", response_model=ApiResponse[ServiceListResponse])
 def list_services(
     department_id: Optional[str] = None,
@@ -23,6 +48,11 @@ def list_services(
         query = query.filter(Service.state.ilike(f"%{state}%"))
 
     services = query.all()
+
+    # Vercel cold-start: DB is empty — serve static seed data directly
+    if not services:
+        items = _static_service_list(language)
+        return ApiResponse.ok(ServiceListResponse(items=items, total=len(items)))
 
     items: List[ServiceSummary] = []
     for s in services:
@@ -69,11 +99,39 @@ def get_service_details(
     db: Session = Depends(get_db)
 ):
     service = db.query(Service).filter(Service.slug == slug).first()
+
+    # Vercel cold-start fallback: serve from static seed data
     if not service:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Service with slug '{slug}' not found"
+        from app.seed import SUBMISSION_SERVICES
+        s = next((x for x in SUBMISSION_SERVICES if x["slug"] == slug), None)
+        if not s:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Service with slug '{slug}' not found"
+            )
+        name = s["name_mr"] if language == "mr" else s["name_en"]
+        desc = s.get("description_mr") if language == "mr" else s.get("description_en", "")
+        short_desc = s.get("short_description_mr") if language == "mr" else s.get("short_description_en", "")
+        dept = s.get("dept_name_mr") if language == "mr" else s.get("dept_name_en", "Maharashtra Govt")
+        detail = ServiceDetailOut(
+            id=s["slug"], slug=s["slug"],
+            name=name or s["name_en"],
+            short_description=short_desc or "",
+            description=desc or "",
+            department_name=dept or "Maharashtra Govt",
+            department_code=s.get("dept_code", "REV_DEPT"),
+            jurisdiction_level="state",
+            state="Maharashtra",
+            districts=["Pune", "All Districts"],
+            statutory_fee_inr=s["statutory_fee_inr"],
+            processing_days=s["processing_days"],
+            official_portal_url=s.get("source_url", "https://aaplesarkar.mahaonline.gov.in"),
+            official_tracking_url="https://aaplesarkar.mahaonline.gov.in/en/TrackStatus",
+            verification_status="verified",
+            is_demo=False,
+            sources=[]
         )
+        return ApiResponse.ok(detail)
 
     name = service.name_en
     short_desc = service.short_description_en

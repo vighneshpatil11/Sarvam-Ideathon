@@ -22,6 +22,28 @@ def search_services(
 
     services: List[Service] = base_query.all()
 
+    # Vercel cold-start: DB is empty — search directly in static seed data
+    if not services:
+        from app.seed import SUBMISSION_SERVICES
+        results = []
+        for s in SUBMISSION_SERVICES:
+            name = s["name_mr"] if language == "mr" else s["name_en"]
+            short_desc = s.get("short_description_mr") if language == "mr" else s.get("short_description_en", "")
+            dept = s.get("dept_name_mr") if language == "mr" else s.get("dept_name_en", "Maharashtra Govt")
+            # Simple keyword match across both languages
+            haystack = f"{s['name_en']} {s.get('name_mr','')} {s.get('short_description_en','')} {s.get('short_description_mr','')}".lower()
+            if not clean_query or any(t in haystack for t in ([clean_query] + terms)):
+                results.append(ServiceSummary(
+                    id=s["slug"], slug=s["slug"],
+                    name=name or s["name_en"],
+                    short_description=short_desc or "",
+                    department_name=dept or "Maharashtra Govt",
+                    state="Maharashtra", districts=["Pune", "All Districts"],
+                    languages=["en", "hi", "mr"], verification_status="verified", is_demo=False,
+                    statutory_fee_inr=s["statutory_fee_inr"], processing_days=s["processing_days"],
+                ))
+        return results
+
     scored_services = []
 
     for s in services:
