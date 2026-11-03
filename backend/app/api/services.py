@@ -129,7 +129,16 @@ def get_service_details(
             official_tracking_url="https://aaplesarkar.mahaonline.gov.in/en/TrackStatus",
             verification_status="verified",
             is_demo=False,
-            sources=[]
+            sources=[
+                SourceOut(
+                    id="aaple-sarkar",
+                    title="Aaple Sarkar MahaOnline Portal",
+                    url=s.get("source_url", "https://aaplesarkar.mahaonline.gov.in"),
+                    publisher="Government of Maharashtra",
+                    source_type="official_gazette",
+                    supports="Official Maharashtra Public Services Directory"
+                )
+            ]
         )
         return ApiResponse.ok(detail)
 

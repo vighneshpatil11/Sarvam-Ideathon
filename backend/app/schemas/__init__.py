@@ -91,11 +91,15 @@ class SearchRequest(BaseModel):
 class DocumentOut(BaseModel):
     id: str
     name: str
-    category: str
-    is_mandatory: bool
+    category: str = "other"
+    is_mandatory: bool = True
+    required: bool = True
     description: Optional[str] = None
+    condition: Optional[str] = None
+    notes: List[str] = []
     issuing_authority: Optional[str] = None
-    display_order: int
+    display_order: int = 1
+    sources: List[SourceOut] = []
 
 class ServiceDocumentsResponse(BaseModel):
     service_slug: str
@@ -106,8 +110,12 @@ class ServiceDocumentsResponse(BaseModel):
 class StepOut(BaseModel):
     step_number: int
     title: str
-    instructions: str
+    instructions: str = ""
+    description: Optional[str] = None
     external_url: Optional[str] = None
+    action_url: Optional[str] = None
+    action_label: Optional[str] = "Open Official Portal"
+    sources: List[SourceOut] = []
 
 class ServiceStepsResponse(BaseModel):
     service_slug: str
@@ -120,13 +128,16 @@ class ServiceStepsResponse(BaseModel):
 # Eligibility Schemas
 class EligibilityQuestionOut(BaseModel):
     id: str
-    field_key: str
-    question_type: str
+    field_key: str = ""
+    question_type: str = "boolean"
+    type: str = "boolean"
     label: str
     help_text: Optional[str] = None
-    required: bool
-    display_order: int
+    description: Optional[str] = None
+    required: bool = True
+    display_order: int = 1
     validation: Optional[Dict[str, Any]] = None
+    options: Optional[List[Dict[str, str]]] = None
 
 class EligibilityQuestionsResponse(BaseModel):
     service_slug: str
