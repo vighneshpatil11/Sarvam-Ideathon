@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { SourceList } from "@/components/UI";
 import { DEMO_MODE } from "@/lib/config";
-import { sendAssistantMessage } from "@/lib/api/assistant";
+import { sendAssistantMessage, type ChatHistoryMessage } from "@/lib/api/assistant";
 import { demoAssistantReply } from "@/data/demo/assistant";
 import { useApp } from "@/context/AppContext";
 import type { AssistantResponse, Language } from "@/types";
@@ -141,13 +141,18 @@ export function AssistantWidget({ standalone = false }: { standalone?: boolean }
     setBusy(true);
 
     try {
+      // Build history from current messages (skip the initial greeting, keep last 6 turns)
+      const historyForApi: ChatHistoryMessage[] = messages
+        .slice(-6)
+        .map((m) => ({ role: m.role as "user" | "assistant", content: m.text }));
+
       const data: AssistantResponse = DEMO_MODE
         ? {
             answer: demoAssistantReply,
             sources: [],
             warnings: ["Demo mode: no live government knowledge base is connected."],
           }
-        : await sendAssistantMessage(trimmed, currentLang, sessionId);
+        : await sendAssistantMessage(trimmed, currentLang, sessionId, undefined, historyForApi);
 
       if (data.session_id) setSessionId(data.session_id);
       setMessages((v) => [...v, { role: "assistant", text: data.answer, data }]);

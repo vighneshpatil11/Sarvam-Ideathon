@@ -152,6 +152,10 @@ class EligibilityEvaluationResponse(BaseModel):
     sources: List[SourceOut] = []
 
 # Assistant Schemas
+class ChatHistoryMessage(BaseModel):
+    role: str  # "user" or "assistant"
+    content: str
+
 class AssistantContext(BaseModel):
     service_slug: Optional[str] = None
 
@@ -160,6 +164,7 @@ class AssistantChatRequest(BaseModel):
     session_id: Optional[str] = None
     language: str = "en"
     context: Optional[AssistantContext] = None
+    history: Optional[List[ChatHistoryMessage]] = []
 
 class AssistantChatResponse(BaseModel):
     session_id: str

@@ -39,9 +39,18 @@ async def assistant_chat(
     provider_name = provider.get_provider_name()
     warnings = []
 
+    # Build message list: history (last 6 turns) + current user message
+    MAX_HISTORY = 6
+    history = req.history or []
+    history_messages = [
+        {"role": m.role, "content": m.content}
+        for m in history[-MAX_HISTORY:]
+    ]
+    history_messages.append({"role": "user", "content": req.message})
+
     try:
         answer = await provider.generate_response(
-            messages=[{"role": "user", "content": req.message}],
+            messages=history_messages,
             system_prompt=system_prompt,
             language=req.language
         )
@@ -52,7 +61,7 @@ async def assistant_chat(
         fallback = LocalFallbackProvider()
         provider_name = fallback.get_provider_name()
         answer = await fallback.generate_response(
-            messages=[{"role": "user", "content": req.message}],
+            messages=history_messages,
             system_prompt=system_prompt,
             language=req.language
         )
