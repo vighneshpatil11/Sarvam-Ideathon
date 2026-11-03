@@ -33,6 +33,8 @@ build/
 dist/
 .pnp
 .pnp.js
+*.tsbuildinfo
+frontend/*.tsbuildinfo
 
 # 4. Python Bytecode & Environments
 __pycache__/
