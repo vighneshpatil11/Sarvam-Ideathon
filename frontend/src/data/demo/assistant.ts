@@ -1,0 +1,1 @@
+export const demoAssistantReply = "This is a demonstration of the SAARTHI assistant interface. No government-specific answer can be verified in demo mode. Connect the Django backend and its approved knowledge base to receive grounded guidance and real source citations.";

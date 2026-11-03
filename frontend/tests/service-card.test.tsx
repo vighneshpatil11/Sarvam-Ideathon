@@ -1,0 +1,2 @@
+import React from "react"; import { describe,expect,it } from "vitest"; import { render,screen } from "@testing-library/react"; import { ServiceCard } from "../src/components/ServiceCard";
+describe("ServiceCard",()=>{it("renders service title and summary",()=>{render(<ServiceCard service={{id:"1",slug:"sample",name:"Sample service",short_description:"Demo summary"}}/>);expect(screen.getByText("Sample service")).toBeTruthy();expect(screen.getByText("Demo summary")).toBeTruthy();});});

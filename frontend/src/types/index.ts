@@ -1,0 +1,10 @@
+export type Language = "en" | "hi" | "mr";
+export type Source = { id?: string; title: string; url: string; source_type?: string; publisher?: string; last_verified_at?: string; last_checked_at?: string; page_number?: number | null };
+export type Service = { id: string; slug: string; name: string; short_description?: string; description?: string; department_name?: string; department?: { name: string }; state?: string; districts?: string[]; jurisdiction?: { state?: string; districts?: string[] }; languages?: Language[]; verification_status?: string; last_verified_at?: string; notes?: string[]; sources?: Source[] };
+export type ServiceList = { items: Service[]; total?: number };
+export type Question = { id: string; label: string; description?: string | null; type: "boolean" | "single_choice" | "number" | "text"; required?: boolean; options?: { value: string; label: string }[] };
+export type EligibilityResult = { status: "potentially_eligible" | "potentially_not_eligible" | "more_information_required" | "unable_to_determine"; summary?: string; explanation?: string; missing_information?: string[]; sources?: Source[] };
+export type ServiceDocument = { id: string; name: string; description?: string; required?: boolean; condition?: string | null; notes?: string[]; sources?: Source[] };
+export type ApplicationStep = { step_number: number; title: string; description?: string; action_url?: string; action_label?: string; sources?: Source[] };
+export type AssistantResponse = { session_id?: string; answer: string; related_services?: { slug: string; name: string }[]; sources?: Source[]; warnings?: string[] };
+export type ApiEnvelope<T> = { success: boolean; data: T; meta?: unknown };

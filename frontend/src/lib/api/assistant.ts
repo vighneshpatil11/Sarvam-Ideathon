@@ -1,0 +1,2 @@
+import { apiRequest } from "./client"; import { endpoints } from "./endpoints"; import type { AssistantResponse, Language } from "@/types";
+export const sendAssistantMessage = (message: string, language: Language, sessionId?: string | null, serviceSlug?: string) => apiRequest<AssistantResponse>(endpoints.assistant, { method: "POST", body: JSON.stringify({ message, session_id: sessionId ?? null, language, context: serviceSlug ? { service_slug: serviceSlug } : {} }) });

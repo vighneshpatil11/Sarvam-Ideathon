@@ -1,0 +1,3 @@
+import { describe, expect, it, vi, afterEach } from "vitest";
+import { apiRequest, ApiError } from "../src/lib/api/client";
+describe("apiRequest",()=>{afterEach(()=>vi.restoreAllMocks());it("unwraps the standard success envelope",async()=>{vi.stubGlobal("fetch",vi.fn().mockResolvedValue(new Response(JSON.stringify({success:true,data:{ok:true}}),{status:200})));await expect(apiRequest<{ok:boolean}>("/health")).resolves.toEqual({ok:true});});it("converts API errors to ApiError",async()=>{vi.stubGlobal("fetch",vi.fn().mockResolvedValue(new Response(JSON.stringify({success:false,error:{code:"BAD_REQUEST",message:"Invalid"}}),{status:400})));await expect(apiRequest("/health")).rejects.toBeInstanceOf(ApiError);});});

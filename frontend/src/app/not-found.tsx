@@ -1,0 +1,2 @@
+import Link from "next/link"; import { Compass } from "lucide-react";
+export default function NotFound(){return <div className="container page-container not-found"><Compass size={42}/><div className="eyebrow">404 · PAGE NOT FOUND</div><h1>We couldn&apos;t find that page.</h1><p>The page may have moved, or the address may be incorrect.</p><Link href="/" className="button button-primary">Return to home</Link></div>}

@@ -1,0 +1,76 @@
+# ==========================================
+# Comprehensive Git Ignore for SAARTHI
+# ==========================================
+
+# 1. Environment Variables & Secret Keys (CRITICAL)
+.env
+.env*
+*.env
+.env.local
+.env.*.local
+!.env.example
+backend/.env
+frontend/.env
+frontend/.env.local
+
+# 2. Database & Data Stores
+*.sqlite
+*.sqlite3
+*.db
+saarthi.db
+backend/saarthi.db
+backend/*.db
+
+# 3. Node.js & Next.js Builds
+node_modules/
+*/node_modules/
+frontend/node_modules/
+.next/
+*/.next/
+frontend/.next/
+out/
+build/
+dist/
+.pnp
+.pnp.js
+
+# 4. Python Bytecode & Environments
+__pycache__/
+*/__pycache__/
+backend/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+develop-eggs/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+venv/
+.venv/
+env/
+ENV/
+
+# 5. Logs & Temporary Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 6. Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 7. Archives & Media Uploads
+*.zip
+*.tar.gz
+*.rar
