@@ -39,8 +39,8 @@ class SarvamAIProvider(BaseAIProvider):
         payload = {
             "model": self.model,
             "messages": chat_messages,
-            "temperature": 0.3,
-            "max_tokens": 500
+            "temperature": 0.4,
+            "max_tokens": 1200
         }
 
         try:
